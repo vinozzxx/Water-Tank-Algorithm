@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Tank Problem Simulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 1200px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .input-section {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 40px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        label {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        #inputHeights {
+            flex: 1;
+            min-width: 300px;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        #inputHeights:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .visualization-area {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #svgCanvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .result-section {
+            display: flex;
+            justify-content: space-around;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 16px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .water-block {
+            animation: fillWater 0.5s ease-out;
+        }
+
+        @keyframes fillWater {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💧 Water Tank Problem</h1>
+            <p>Calculate trapped water volume using elevation map</p>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <label for="inputHeights">Elevation Heights:</label>
+                <input type="text" id="inputHeights" value="0,1,0,2,1,0,1,3,2,1,2,1" placeholder="Enter comma-separated heights (e.g., 0,1,0,2,1,0,1,3,2,1,2,1)">
+                <button onclick="handleCalculate()">Calculate</button>
+            </div>
+        </div>
+
+        <div class="visualization-area">
+            <svg id="svgCanvas" width="900" height="350"></svg>
+        </div>
+
+        <div class="result-section">
+            <div class="stat-card">
+                <div class="stat-label">Water Trapped</div>
+                <div class="stat-value"><span id="result">0</span> units</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="stat-label">Total Blocks</div>
+                <div class="stat-value"><span id="totalBlocks">0</span></div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="stat-label">Max Height</div>
+                <div class="stat-value"><span id="maxHeight">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateWater(heights) {
+            if (!heights || heights.length === 0) return 0;
+            
+            const n = heights.length;
+            const leftMax = new Array(n);
+            const rightMax = new Array(n);
+            
+            leftMax[0] = heights[0];
+            for (let i = 1; i < n; i++) {
+                leftMax[i] = Math.max(leftMax[i - 1], heights[i]);
+            }
+            
+            rightMax[n - 1] = heights[n - 1];
+            for (let i = n - 2; i >= 0; i--) {
+                rightMax[i] = Math.max(rightMax[i + 1], heights[i]);
+            }
+            
+            let water = 0;
+            for (let i = 0; i < n; i++) {
+                water += Math.min(leftMax[i], rightMax[i]) - heights[i];
+            }
+            
+            return water;
+        }
+
+        function drawVisualization(heights) {
+            const svg = document.getElementById('svgCanvas');
+            svg.innerHTML = '';
+            
+            if (!heights || heights.length === 0) {
+                svg.innerHTML = '<text x="450" y="175" text-anchor="middle" fill="#999" font-size="20">Enter heights and click Calculate to see visualization</text>';
+                return;
+            }
+            
+            const maxHeight = Math.max(...heights);
+            const blockWidth = Math.min(60, 800 / heights.length);
+            const blockHeightUnit = 250 / (maxHeight + 2);
+            const startX = 50;
+            const baseY = 300;
+            
+            // Calculate water levels
+            const n = heights.length;
+            const leftMax = new Array(n);
+            const rightMax = new Array(n);
+            
+            leftMax[0] = heights[0];
+            for (let i = 1; i < n; i++) {
+                leftMax[i] = Math.max(leftMax[i - 1], heights[i]);
+            }
+            
+            rightMax[n - 1] = heights[n - 1];
+            for (let i = n - 2; i >= 0; i--) {
+                rightMax[i] = Math.max(rightMax[i + 1], heights[i]);
+            }
+            
+            // Draw water first (behind blocks)
+            for (let i = 0; i < heights.length; i++) {
+                const waterLevel = Math.min(leftMax[i], rightMax[i]);
+                const waterHeight = waterLevel - heights[i];
+                
+                if (waterHeight > 0) {
+                    const x = startX + i * blockWidth;
+                    const y = baseY - waterLevel * blockHeightUnit;
+                    const h = waterHeight * blockHeightUnit;
+                    
+                    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    rect.setAttribute('x', x);
+                    rect.setAttribute('y', y);
+                    rect.setAttribute('width', blockWidth - 2);
+                    rect.setAttribute('height', h);
+                    rect.setAttribute('fill', 'url(#waterGradient)');
+                    rect.setAttribute('opacity', '0.8');
+                    rect.setAttribute('class', 'water-block');
+                    svg.appendChild(rect);
+                }
+            }
+            
+            // Draw blocks
+            for (let i = 0; i < heights.length; i++) {
+                const x = startX + i * blockWidth;
+                const h = heights[i] * blockHeightUnit;
+                const y = baseY - h;
+                
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', x);
+                rect.setAttribute('y', y);
+                rect.setAttribute('width', blockWidth - 2);
+                rect.setAttribute('height', h);
+                rect.setAttribute('fill', 'url(#blockGradient)');
+                rect.setAttribute('rx', '4');
+                svg.appendChild(rect);
+                
+                // Height label
+                if (heights[i] > 0) {
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', x + (blockWidth - 2) / 2);
+                    text.setAttribute('y', y - 5);
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('fill', '#333');
+                    text.setAttribute('font-size', '12');
+                    text.setAttribute('font-weight', 'bold');
+                    text.textContent = heights[i];
+                    svg.appendChild(text);
+                }
+            }
+            
+            // Add gradients
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            
+            const waterGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            waterGradient.setAttribute('id', 'waterGradient');
+            waterGradient.setAttribute('x1', '0%');
+            waterGradient.setAttribute('y1', '0%');
+            waterGradient.setAttribute('x2', '0%');
+            waterGradient.setAttribute('y2', '100%');
+            waterGradient.innerHTML = '<stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" /><stop offset="100%" style="stop-color:#00f2fe;stop-opacity:1" />';
+            defs.appendChild(waterGradient);
+            
+            const blockGradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            blockGradient.setAttribute('id', 'blockGradient');
+            blockGradient.setAttribute('x1', '0%');
+            blockGradient.setAttribute('y1', '0%');
+            blockGradient.setAttribute('x2', '0%');
+            blockGradient.setAttribute('y2', '100%');
+            blockGradient.innerHTML = '<stop offset="0%" style="stop-color:#667eea;stop-opacity:1" /><stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />';
+            defs.appendChild(blockGradient);
+            
+            svg.insertBefore(defs, svg.firstChild);
+        }
+
+        function handleCalculate() {
+            const input = document.getElementById('inputHeights').value;
+            const heights = input.split(',').map(h => parseInt(h.trim())).filter(h => !isNaN(h));
+            
+            if (heights.length === 0) {
+                alert('Please enter valid heights');
+                return;
+            }
+            
+            const waterTrapped = calculateWater(heights);
+            const maxHeight = Math.max(...heights, 0);
+            
+            document.getElementById('result').textContent = waterTrapped;
+            document.getElementById('totalBlocks').textContent = heights.length;
+            document.getElementById('maxHeight').textContent = maxHeight;
+            
+            drawVisualization(heights);
+        }
+
+        // Initial calculation
+        window.addEventListener('load', () => {
+            handleCalculate();
+        });
+
+        // Allow Enter key to calculate
+        document.getElementById('inputHeights').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleCalculate();
+            }
+        });
+    </script>
+</body>
+</html>
