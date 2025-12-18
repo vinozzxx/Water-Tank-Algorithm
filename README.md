@@ -1,10 +1,18 @@
-# 💧 Water Tank Problem – Vanilla JavaScript Web App
+#  Water Tank Problem – Vanilla JavaScript Web App
 
 A simple **frontend web application** that visualizes and calculates how much **rainwater is trapped between blocks** of different heights. This project is built using **HTML, CSS, and Vanilla JavaScript** and follows the classic **Water Tank (Trapping Rain Water) problem**.
 
 ---
 
-## 📌 Project Need / Purpose
+##  Screenshots
+
+![Water Tank Output](https://github.com/vinozzxx/Water-Tank---Algorithm/blob/e30c166b30128a605762003f75def5fb1b6ce348/image%201%20%20.png)
+
+![Water Tank Output](https://github.com/vinozzxx/Water-Tank---Algorithm/blob/e30c166b30128a605762003f75def5fb1b6ce348/image%202%20.png)
+
+---
+
+##  Project Need / Purpose
 
 In many real‑world and technical interview scenarios, we need to **analyze elevation data** and calculate how much water can be stored between structures.
 
@@ -19,7 +27,7 @@ The app visually represents blocks and trapped water, making the logic **easy to
 
 ---
 
-## 🧠 Problem Statement
+##  Problem Statement
 
 Given an array of non‑negative integers representing block heights, compute how many **units of water** are trapped between the blocks after raining.
 
@@ -32,7 +40,7 @@ Output : 18 Units
 
 ---
 
-## 🛠️ Technologies Used
+## Technologies Used
 
 * **HTML5** – Structure of the application
 * **CSS3** – Styling and layout
@@ -41,7 +49,7 @@ Output : 18 Units
 
 ---
 
-## 📂 Project File Structure
+##  Project File Structure
 
 ```
 WATER-TANK/
@@ -55,7 +63,7 @@ WATER-TANK/
 
 ---
 
-## ⚙️ How It Works
+##  How It Works
 
 1. User provides an **array of block heights**
 2. JavaScript calculates:
@@ -71,19 +79,8 @@ water = min(leftMax, rightMax) - height[i]
 4. Total trapped water is displayed
 5. Blocks and water are **visually rendered**
 
----
 
-## 📸 Screenshots
-
-### 🔹 Project Output Visualization
-
-![Water Tank Output](./screenshot.png)
-
-> 📌 *Shows block heights and trapped water units clearly*
-
----
-
-## 🚀 How to Run the Project
+##  How to Run the Project
 
 1. Clone the repository
 
@@ -99,14 +96,14 @@ water = min(leftMax, rightMax) - height[i]
 
 ---
 
-## 📈 Output
+##  Output
 
 * Displays **total water units trapped**
 * Shows **visual blocks and water levels**
 
 ---
 
-## 🎯 Learning Outcomes
+##  Learning Outcomes
 
 * Strong understanding of array traversal
 * Frontend problem‑solving practice
@@ -115,14 +112,13 @@ water = min(leftMax, rightMax) - height[i]
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
-**Vino**
-Aspiring Data Scientist | Frontend & JavaScript Learner
+**Vinothkumar**
+Aspiring Data Scientist 
 
 ---
 
-## ⭐ If you like this project
 
 Give it a ⭐ on GitHub and feel free to fork or improve it!
 
